@@ -63,6 +63,7 @@ def sync(message):
 @bot.message_handler(commands=['admin'], func=lambda message: message.chat.id == ADMIN_ID)
 def admin(message):
     chat_id = message.chat.id
+    bot.send_message(chat_id, msg.SEND_MESSAGE_ADMIN)
 
 
 my_commands = [
