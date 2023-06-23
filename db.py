@@ -1,16 +1,27 @@
 import sqlite3
 
 
-def add_user(chat_id, first_name, last_name, username=None):
+def db_config():
+    with sqlite3.connect('db.sqlite3') as connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute('CREATE TABLE users ('
+                           'id INTEGER PRIMARY KEY,'
+                           'chat_id INTEGER NOT NULL UNIQUE ,'
+                           'first_name VARCHAR(255)'
+                           ')')
+        except Exception as e:
+            return f'Error <b>{e}</b>'
+        else:
+            return True
+
+
+def add_user(chat_id, first_name, last_name):
     try:
         with sqlite3.connect('db.sqlite3') as connection:
             cursor = connection.cursor()
-            if username is not None:
-                cursor.execute('INSERT INTO users (chat_id,username, first_name, last_name) VALUES (?,?,?,?)',
-                               (chat_id, username, first_name, last_name))
-            else:
-                cursor.execute('INSERT INTO users (chat_id,first_name,last_name) VALUES (?,?,?)',
-                               (chat_id, first_name, last_name))
+            cursor.execute('INSERT INTO users (chat_id,first_name) VALUES (?,?)',
+                           (chat_id, first_name))
     except Exception as e:
         return f'Failed to add user {e}'
 
