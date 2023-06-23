@@ -71,5 +71,5 @@ my_commands = [
 ]
 if __name__ == '__main__':
     print('Starting...')
-    bot.infinity_polling(skip_pending=True)
+    bot.polling()
     bot.set_my_commands(my_commands)
