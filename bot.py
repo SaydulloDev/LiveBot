@@ -1,4 +1,5 @@
 import environs
+import telebot as telebot
 from telebot import TeleBot
 
 import db
@@ -18,8 +19,7 @@ def start(message):
     first_name = message.from_user.first_name
     if db.get_user(chat_id) is not True:
         last_name = message.from_user.last_name
-        username = message.from_user.username
-        db.add_user(chat_id, first_name, last_name, username)
+        db.add_user(chat_id, first_name, last_name)
     bot.send_message(chat_id, msg.start(first_name))
     bot.send_message(chat_id, msg.SEND_MESSAGE)
 
@@ -33,20 +33,43 @@ def forward_to_admin(message):
 def reply_to_user(message):
     forwarded_message = message.reply_to_message
     original_chat_id = forwarded_message.forward_from.id
-    response_text = message.text
     try:
+        response_text = message.text
         bot.send_message(original_chat_id, response_text)
     except Exception as e:
-        bot.send_message(ADMIN_ID, 'Error {}'.format(e))
+        bot.send_message(ADMIN_ID, '⛔Error {}'.format(e))
 
 
 @bot.message_handler(commands=['users'], func=lambda message: message.chat.id == ADMIN_ID)
 def get_all_user(message):
     chat_id = message.chat.id
     info_users = db.get_full_info()
+    print(info_users)
     bot.send_message(chat_id, utils.format_data(info_users))
 
 
+@bot.message_handler(commands=['sync'], func=lambda message: message.chat.id == ADMIN_ID)
+def sync(message):
+    chat_id = message.chat.id
+    try:
+        config = db.db_config()
+    except Exception as e:
+        bot.send_message(chat_id, f'⛔Error {e}')
+    else:
+        if config is True:
+            bot.send_message(chat_id, 'Successfully synced✅')
+
+
+@bot.message_handler(commands=['admin'], func=lambda message: message.chat.id == ADMIN_ID)
+def admin(message):
+    chat_id = message.chat.id
+
+
+my_commands = [
+    telebot.types.BotCommand("/start", "Start"),
+    telebot.types.BotCommand("/admin", "Admin Panel"),
+]
 if __name__ == '__main__':
     print('Starting...')
     bot.infinity_polling(skip_pending=True)
+    bot.set_my_commands(my_commands)
