@@ -44,7 +44,6 @@ def reply_to_user(message):
 def get_all_user(message):
     chat_id = message.chat.id
     info_users = db.get_full_info()
-    print(info_users)
     bot.send_message(chat_id, utils.format_data(info_users))
 
 
